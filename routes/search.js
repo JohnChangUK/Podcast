@@ -23,7 +23,7 @@ router.get('/:term', function(req, res, next) {
       return;
     }
 
-    console.log(JSON.stringify(response));
+    // console.log(JSON.stringify(response));
 
     var data = JSON.parse(response.text);
 
