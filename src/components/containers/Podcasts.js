@@ -9,26 +9,23 @@ class Podcasts extends Component {
 
     return (
       <div>
-        
         { list.map( (podcast, i) => {
             return (
                 <div key={i} className="shop-banner animated fadeinup delay-2">
-                  <a href="category.html">
-                    <img src="img/banner2.jpg" alt="" />
+                  <a href="#">
+                    <img src={podcast.artworkUrl600} alt="" />
                     <div className="opacity-overlay valign-wrapper">
                       <div className="valign center width-100">
-                        <h3 className="white-text">Accessories</h3>
-                        <p className="white-text">Watches 2016</p>
+                        <p className="white-text">{podcast.collectionName}</p>
                       </div>
                     </div>
                   </a>
                 </div>  
               );
-        })
-      }                            
-
-        </div>
-      );
+          })
+        }                            
+      </div>
+    );
   }
 }
 
