@@ -29,7 +29,7 @@ router.get('/:term', function(req, res, next) {
 
       res.json({
       confirmation: 'success',
-      response: data.results
+      results: data.results
     });
 
   });

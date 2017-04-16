@@ -13,8 +13,8 @@ export default {
 
         store = createStore(
             reducers,
-            applyMiddleware(thunk)
-            )
+            applyMiddleware(thunk) 
+            );
         
         return store;
     },
@@ -22,4 +22,4 @@ export default {
     currentStore: () => {
         return store;
     }
-}
+};

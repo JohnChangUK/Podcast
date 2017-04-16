@@ -4,8 +4,7 @@ import bluebird from 'bluebird';
 module.exports = {
 
     get: (endpoint, params) => {
-        return new Promise( (resolve, reject) => {
-            
+        return new Promise( (resolve, reject) => {          
             superagent
             .get(endpoint)
             .query(params)
@@ -17,9 +16,7 @@ module.exports = {
                 }
                 
                 resolve(response.body);
-
             });
-        });
-        
+        });     
     }
-}
+};

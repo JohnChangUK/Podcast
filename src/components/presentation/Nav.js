@@ -23,10 +23,8 @@ export default (props) => {
                 <li><a href="contact.html" className="no-child">Contact</a></li>
               </ul>
         </div>
-        </nav> 
-        
-      </div>
-      
+        </nav>       
+      </div>     
     );
 }
 

@@ -1,6 +1,8 @@
 import React, { Component } from 'react';
 import { Search } from '../presentation';
 import { APIClient } from '../../utils';
+import { connect } from 'react-redux';
+import actions from '../../actions';
 
 class Playlist extends Component { 
 
@@ -8,13 +10,14 @@ class Playlist extends Component {
         if (event.keyCode != 13) 
             return;
 
-        console.log(`searchPodcasts: ${event.target.value}` );
+        console.log(`searchPodcasts: ${event.target.value}`);
         const endpoint = '/search/' + event.target.value;
 
         APIClient
         .get(endpoint, null)
         .then(response => {
-            console.log(JSON.stringify(response));
+            // console.log(JSON.stringify(response));
+            this.props.podcastsReceived(response.results);
         })
         .catch(err => {
             console.log("ERROR" + JSON.stringify(err));
@@ -30,8 +33,22 @@ class Playlist extends Component {
 
                 <Search onSearch={this.searchPodcasts.bind(this)} />
             </div>      
-            );
+        );
     }
 }
 
-export default Playlist;
+// state.podcast is referring to the store,
+// the key podcast which refers to: podcastReducer
+const stateToProps = (state) => {
+    return {
+        podcasts: state.podcast
+    }
+}
+
+const dispatchToProps = (dispatch) => {
+    return {
+        podcastsReceived: (podcasts) => dispatch(actions.podcastsReceived(podcasts))
+    }
+}
+
+export default connect(stateToProps, dispatchToProps)(Playlist);
