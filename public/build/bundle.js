@@ -11664,7 +11664,7 @@ exports.default = function (props) {
           _react2.default.createElement(
             "p",
             { className: "center-align grey-text text-lighten-4" },
-            "You can use rows and columns here to organize your footer content."
+            "A Podcast and Playlist made by John Chang"
           ),
           _react2.default.createElement(
             "div",
@@ -11684,7 +11684,7 @@ exports.default = function (props) {
       _react2.default.createElement(
         "div",
         { className: "container" },
-        "2016 Codnauts",
+        "John Chang \xA9",
         _react2.default.createElement(
           "a",
           { className: "grey-text text-lighten-4 right", href: "#!" },
