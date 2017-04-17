@@ -64,7 +64,13 @@ class Playlist extends Component {
         })
         .catch(err => {
             console.log("ERROR" + JSON.stringify(err));
-        })
+        });
+    }
+
+    componentDidUpdate() {
+// this.props.podcasts refers to the stateToProps['podcasts'] key
+// selected refers to the key initialState['selected'] in podcastReducer
+      console.log('componentDidUpdate: ' + JSON.stringify(this.props.podcasts.selected));
     }
 
     render() {
@@ -82,18 +88,25 @@ class Playlist extends Component {
     }
 }
 
-// state.podcast is referring to the store,
-// the key podcast which refers to: podcastReducer
+// stateToProps is how you take the global state and
+// map it to React's component's property types
+// that way you can reference them in React Components
 const stateToProps = (state) => {
     return {
+// state.podcast is referring to the store,
+// the key podcast which refers to: podcastReducer
         podcasts: state.podcast
     }
 }
 
+// dispatch is how actions are fired
 const dispatchToProps = (dispatch) => {
     return {
+// when podcastsReceived gets fired, it goes into actions and get the type
+// Then call the reducer and look the the case statement matching the action.type
         podcastsReceived: (podcasts) => dispatch(actions.podcastsReceived(podcasts))
     }
 }
 
+// Self executing file, therefore we have to reference the class component 'Playlist' at the end
 export default connect(stateToProps, dispatchToProps)(Playlist);

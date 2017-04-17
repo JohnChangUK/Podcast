@@ -6863,6 +6863,13 @@ exports.default = {
             type: _constants2.default.PODCASTS_RECEIVED,
             podcasts: podcasts
         };
+    },
+
+    podcastSelected: function podcastSelected(podcast) {
+        return {
+            type: _constants2.default.PODCAST_SELECTED,
+            podcast: podcast
+        };
     }
 };
 
@@ -6909,7 +6916,8 @@ Object.defineProperty(exports, "__esModule", {
 exports.default = {
 
     SEARCH_PODCASTS: 'SEARCH_PODCASTS',
-    PODCASTS_RECEIVED: 'PODCASTS_RECEIVED'
+    PODCASTS_RECEIVED: 'PODCASTS_RECEIVED',
+    PODCAST_SELECTED: 'PODCAST_SELECTED'
 
 };
 
@@ -11104,12 +11112,14 @@ function _interopRequireDefault(obj) { return obj && obj.__esModule ? obj : { de
 var store;
 
 exports.default = {
-
+    // Creating the package of reducers
     initialize: function initialize() {
         var reducers = (0, _redux.combineReducers)({
+            // the key podcast if how you reference podcastReducer in the entire application,
+            // which contains the data of podcasts
             podcast: _reducers.podcastReducer
         });
-
+        // Initializing the store
         store = (0, _redux.createStore)(reducers, (0, _redux.applyMiddleware)(_reduxThunk2.default));
 
         return store;
@@ -11283,6 +11293,13 @@ var Playlist = function (_Component) {
             });
         }
     }, {
+        key: 'componentDidUpdate',
+        value: function componentDidUpdate() {
+            // this.props.podcasts refers to the stateToProps['podcasts'] key
+            // selected refers to the key initialState['selected'] in podcastReducer
+            console.log('componentDidUpdate: ' + JSON.stringify(this.props.podcasts.selected));
+        }
+    }, {
         key: 'render',
         value: function render() {
             return _react2.default.createElement(
@@ -11305,24 +11322,31 @@ var Playlist = function (_Component) {
     return Playlist;
 }(_react.Component);
 
-// state.podcast is referring to the store,
-// the key podcast which refers to: podcastReducer
+// stateToProps is how you take the global state and
+// map it to React's component's property types
+// that way you can reference them in React Components
 
 
 var stateToProps = function stateToProps(state) {
     return {
+        // state.podcast is referring to the store,
+        // the key podcast which refers to: podcastReducer
         podcasts: state.podcast
     };
 };
 
+// dispatch is how actions are fired
 var dispatchToProps = function dispatchToProps(dispatch) {
     return {
+        // when podcastsReceived gets fired, it goes into actions and get the type
+        // Then call the reducer and look the the case statement matching the action.type
         podcastsReceived: function podcastsReceived(podcasts) {
             return dispatch(_actions2.default.podcastsReceived(podcasts));
         }
     };
 };
 
+// Self executing file, therefore we have to reference the class component 'Playlist' at the end
 exports.default = (0, _reactRedux.connect)(stateToProps, dispatchToProps)(Playlist);
 
 /***/ }),
@@ -11366,8 +11390,16 @@ var Podcasts = function (_Component) {
   }
 
   _createClass(Podcasts, [{
+    key: 'selectPodcast',
+    value: function selectPodcast(podcast, event) {
+      // console.log("selectPodcast: " + JSON.stringify(podcast));
+      this.props.podcastSelected(podcast);
+    }
+  }, {
     key: 'render',
     value: function render() {
+      var _this2 = this;
+
       var list = this.props.podcasts.all || [];
 
       return _react2.default.createElement(
@@ -11379,7 +11411,7 @@ var Podcasts = function (_Component) {
             { key: i, className: 'shop-banner animated fadeinup delay-2' },
             _react2.default.createElement(
               'a',
-              { href: '#' },
+              { onClick: _this2.selectPodcast.bind(_this2, podcast), href: '#' },
               _react2.default.createElement('img', { src: podcast.artworkUrl600, alt: '' }),
               _react2.default.createElement(
                 'div',
@@ -11404,13 +11436,25 @@ var Podcasts = function (_Component) {
   return Podcasts;
 }(_react.Component);
 
+// We want to connect to the same data from store as Playlist
+
+
 var stateToProps = function stateToProps(state) {
   return {
     podcasts: state.podcast
   };
 };
 
-exports.default = (0, _reactRedux.connect)(stateToProps)(Podcasts);
+// We want to tell the redux store a podcast has been selected
+var dispatchToProps = function dispatchToProps(dispatch) {
+  return {
+    podcastSelected: function podcastSelected(podcast) {
+      return dispatch(_actions2.default.podcastSelected(podcast));
+    }
+  };
+};
+
+exports.default = (0, _reactRedux.connect)(stateToProps, dispatchToProps)(Podcasts);
 
 /***/ }),
 /* 107 */
@@ -11725,8 +11769,11 @@ var _constants2 = _interopRequireDefault(_constants);
 function _interopRequireDefault(obj) { return obj && obj.__esModule ? obj : { default: obj }; }
 
 var initialState = {
-    all: null
+    all: null,
+    selected: null
 };
+
+// Reducers are pieces of data to be saved in the Store
 
 exports.default = function () {
     var state = arguments.length > 0 && arguments[0] !== undefined ? arguments[0] : initialState;
@@ -11736,9 +11783,18 @@ exports.default = function () {
 
     switch (action.type) {
         case _constants2.default.PODCASTS_RECEIVED:
-            console.log('PODCASTS_RECEIVED: ' + JSON.stringify(action.podcasts));
+            // console.log('PODCASTS_RECEIVED: ' + JSON.stringify(action.podcasts));
             updated['all'] = action.podcasts;
 
+            return updated;
+
+        case _constants2.default.PODCAST_SELECTED:
+            // console.log('PODCAST_SELECTED: ' + JSON.stringify(action.podcast));
+            if (updated.selected != null) {
+                if (updated.selected.collectionId == action.podcast.collectionId) return state;
+            }
+
+            updated['selected'] = action.podcast;
             return updated;
 
         default:
@@ -11772,7 +11828,7 @@ module.exports = {
                     reject(err);
                     return;
                 }
-
+                // result gets passed in the body of the response
                 resolve(response.body);
             });
         });

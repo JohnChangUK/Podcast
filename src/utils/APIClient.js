@@ -14,7 +14,7 @@ module.exports = {
                     reject(err)
                     return;
                 }
-                
+    // result gets passed in the body of the response
                 resolve(response.body);
             });
         });     
