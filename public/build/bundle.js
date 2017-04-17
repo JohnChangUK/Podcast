@@ -11298,6 +11298,13 @@ var Playlist = function (_Component) {
             // this.props.podcasts refers to the stateToProps['podcasts'] key
             // selected refers to the key initialState['selected'] in podcastReducer
             console.log('componentDidUpdate: ' + JSON.stringify(this.props.podcasts.selected));
+            if (this.props.podcasts.selected == null) return;
+
+            // grab the feedUrl from the JSON, then made request for RSS feed
+            var feedUrl = this.props.podcasts.selected['feedUrl'];
+            if (feedUrl == null) return;
+
+            console.log('feedUrl: ' + feedUrl);
         }
     }, {
         key: 'render',
