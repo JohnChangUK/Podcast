@@ -12,5 +12,12 @@ export default {
             type: constants.PODCASTS_RECEIVED,
             podcasts: podcasts
         };
+    },
+
+    podcastSelected: (podcast) => {
+        return {
+            type: constants.PODCAST_SELECTED,
+            podcast: podcast
+        };
     }
 };
