@@ -9,7 +9,7 @@ class Playlist extends Component {
   constructor() {
     super();
     this.state = {
-      trackList: null,
+      // trackList: null,
       player: null
     };
   }
@@ -62,7 +62,7 @@ class Playlist extends Component {
     //     console.log('error');
     // });   
     this.setState({
-      trackList: list,
+      // trackList: list,
       player: ap1
     });
   }
@@ -81,7 +81,7 @@ class Playlist extends Component {
             this.props.podcastsReceived(response.results);
         })
         .catch(err => {
-            console.log("ERROR" + JSON.stringify(response));
+            console.log("ERROR" + err.message);
         });
     }
 
@@ -97,10 +97,30 @@ class Playlist extends Component {
     if (feedUrl == null)
       return;
 // If the tracklist is not null, do not run the code after
-    if (this.state.trackList != null) // tracks are already loaded
-      return;
+    // if (this.state.trackList != null) // tracks are already loaded
+    //   return;
 
-    console.log('FEED URL: ' + feedUrl);
+    if (this.props.podcasts.trackList != null){ // tracks already loaded
+        if (this.state.player == null) {
+                  // We want to use the trackList from the Reducer
+          this.initializePlayer(this.props.podcasts.trackList);
+        }
+        return;
+    }
+
+    //RESET THE PLAYER:
+    if (this.state.player != null) {
+      this.state.player.pause();
+      this.setState({
+// In other words, Clear it out, because a previous station
+// has been selected, so we want to clear it out, reset the player
+// and re-initialize once the new tracklist has been loaded
+// We do this by going back to the if statement above,
+// this.initializePlayer(this.props.podcasts.trackList) initializes it
+        player: null
+      });
+    }
+
     APIClient
     .get('/feed', {url: feedUrl})
     .then(response => {
@@ -118,17 +138,11 @@ class Playlist extends Component {
         trackInfo['url'] = enclosure['url'];
         list.push(trackInfo);
       });
-
+// This action will populate the Reducer's trackList
       this.props.trackListReady(list);
-
-      // if (this.state.player == null){
-      //   this.initializePlayer(list);
-      // }
-
-//     console.log(JSON.stringify(podcast.item))
     })
     .catch(err => {
-      console.log('ERROR: '+JSON.stringify(response));
+      console.log('ERROR: '+ err.message);
     });
   }
 

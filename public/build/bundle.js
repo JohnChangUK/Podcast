@@ -11242,7 +11242,7 @@ var Playlist = function (_Component) {
         var _this = _possibleConstructorReturn(this, (Playlist.__proto__ || Object.getPrototypeOf(Playlist)).call(this));
 
         _this.state = {
-            trackList: null,
+            // trackList: null,
             player: null
         };
         return _this;
@@ -11298,7 +11298,7 @@ var Playlist = function (_Component) {
             //     console.log('error');
             // });   
             this.setState({
-                trackList: list,
+                // trackList: list,
                 player: ap1
             });
         }
@@ -11316,7 +11316,7 @@ var Playlist = function (_Component) {
                 // console.log(JSON.stringify(response));
                 _this2.props.podcastsReceived(response.results);
             }).catch(function (err) {
-                console.log("ERROR" + JSON.stringify(response));
+                console.log("ERROR" + err.message);
             });
         }
     }, {
@@ -11333,10 +11333,31 @@ var Playlist = function (_Component) {
             var feedUrl = this.props.podcasts.selected['feedUrl'];
             if (feedUrl == null) return;
             // If the tracklist is not null, do not run the code after
-            if (this.state.trackList != null) // tracks are already loaded
-                return;
+            // if (this.state.trackList != null) // tracks are already loaded
+            //   return;
 
-            console.log('FEED URL: ' + feedUrl);
+            if (this.props.podcasts.trackList != null) {
+                // tracks already loaded
+                if (this.state.player == null) {
+                    // We want to use the trackList from the Reducer
+                    this.initializePlayer(this.props.podcasts.trackList);
+                }
+                return;
+            }
+
+            //RESET THE PLAYER:
+            if (this.state.player != null) {
+                this.state.player.pause();
+                this.setState({
+                    // In other words, Clear it out, because a previous station
+                    // has been selected, so we want to clear it out, reset the player
+                    // and re-initialize once the new tracklist has been loaded
+                    // We do this by going back to the if statement above,
+                    // this.initializePlayer(this.props.podcasts.trackList) initializes it
+                    player: null
+                });
+            }
+
             _utils.APIClient.get('/feed', { url: feedUrl }).then(function (response) {
                 var podcast = response.podcast;
                 var item = podcast.item;
@@ -11352,16 +11373,10 @@ var Playlist = function (_Component) {
                     trackInfo['url'] = enclosure['url'];
                     list.push(trackInfo);
                 });
-
+                // This action will populate the Reducer's trackList
                 _this3.props.trackListReady(list);
-
-                // if (this.state.player == null){
-                //   this.initializePlayer(list);
-                // }
-
-                //     console.log(JSON.stringify(podcast.item))
             }).catch(function (err) {
-                console.log('ERROR: ' + JSON.stringify(response));
+                console.log('ERROR: ' + err.message);
             });
         }
     }, {
@@ -11863,10 +11878,12 @@ exports.default = function () {
                 if (updated.selected.collectionId == action.podcast.collectionId) return state;
             }
 
+            updated['trackList'] = null;
             updated['selected'] = action.podcast;
             return updated;
 
         case _constants2.default.TRACKLIST_READY:
+            console.log("TRACKLIST_READY: ");
             updated['trackList'] = action.list;
             return updated;
 
