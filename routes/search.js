@@ -2,7 +2,7 @@ var express = require('express');
 var router = express.Router();
 var superagent = require('superagent');
 
-/* GET users listing. */
+
 router.get('/:term', function(req, res, next) {
   var term = req.params.term;
 

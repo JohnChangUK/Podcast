@@ -1,11 +1,10 @@
 var express = require('express');
 var router = express.Router();
 var superagent = require('superagent');
+var xml2js = require('xml2js');
 
-/* GET users listing. */
 router.get('/', function(req, res, next) {
 
-  // var term = req.params.term;
   var url = req.query.url;
   if (url == null) {
     res.json({
@@ -28,9 +27,23 @@ router.get('/', function(req, res, next) {
 
       return;
     }
+    
+    var xml = response.text;
 
-    // console.log(JSON.stringify(response));
-    res.send(response.text);
+    xml2js.parseString(xml, function (err, result) {
+        // console.dir(result);
+        var rss = result.rss;
+        var channel = rss.channel;
+        if (channel.length > 0)
+          channel = channel[0];
+
+        res.json({
+          confirmation: 'Success',
+          podcast: channel
+        });
+    });
+
+    // res.send(response.text);
   });
 
 });
