@@ -6870,6 +6870,13 @@ exports.default = {
             type: _constants2.default.PODCAST_SELECTED,
             podcast: podcast
         };
+    },
+
+    trackListReady: function trackListReady(list) {
+        return {
+            type: _constants2.default.TRACKLIST_READY,
+            list: list
+        };
     }
 };
 
@@ -6917,7 +6924,8 @@ exports.default = {
 
     SEARCH_PODCASTS: 'SEARCH_PODCASTS',
     PODCASTS_RECEIVED: 'PODCASTS_RECEIVED',
-    PODCAST_SELECTED: 'PODCAST_SELECTED'
+    PODCAST_SELECTED: 'PODCAST_SELECTED',
+    TRACKLIST_READY: 'TRACKLIST_READY'
 
 };
 
@@ -11246,6 +11254,17 @@ var Playlist = function (_Component) {
     }, {
         key: 'initializePlayer',
         value: function initializePlayer(list) {
+            var sublist = [];
+            if (list.length > 3) {
+                // Limit list size to 3
+                for (var i = 0; i < 3; i++) {
+                    sublist.push(list[i]);
+                }
+            } else {
+                // If not bigger than 3, just copy the entire thing
+                sublist = Object.assign([], list);
+            }
+
             var ap1 = new _aplayer2.default({
                 element: document.getElementById('player1'),
                 narrow: false,
@@ -11255,7 +11274,7 @@ var Playlist = function (_Component) {
                 theme: '#e6d0b2',
                 preload: 'metadata',
                 mode: 'circulation',
-                music: list
+                music: sublist
             });
             // ap1.on('play', function () {
             //     console.log('play');
@@ -11322,28 +11341,23 @@ var Playlist = function (_Component) {
                 var podcast = response.podcast;
                 var item = podcast.item;
 
-                // {
-                //   title: 'Preparation',
-                //   author: 'Hans Zimmer/Richard Harvey',
-                //   url: 'http://devtest.qiniudn.com/Preparation.mp3',
-                //   pic: 'http://devtest.qiniudn.com/Preparation.jpg'
-                // }
                 var list = [];
                 item.forEach(function (track, i) {
                     var trackInfo = {};
-                    trackInfo['title'] = 'Track ' + i;
-                    trackInfo['author'] = 'TEST';
-                    trackInfo['pic'] = 'http://devtest.qiniudn.com/Preparation.jpg';
+                    trackInfo['title'] = track.title[0];
+                    trackInfo['author'] = _this3.props.podcasts.selected.collectionName;
+                    trackInfo['pic'] = _this3.props.podcasts.selected['artworkUrl600'];
 
                     var enclosure = track.enclosure[0]['$'];
                     trackInfo['url'] = enclosure['url'];
                     list.push(trackInfo);
                 });
 
-                console.log(JSON.stringify(list));
-                if (_this3.state.player == null) {
-                    _this3.initializePlayer(list);
-                }
+                _this3.props.trackListReady(list);
+
+                // if (this.state.player == null){
+                //   this.initializePlayer(list);
+                // }
 
                 //     console.log(JSON.stringify(podcast.item))
             }).catch(function (err) {
@@ -11393,6 +11407,9 @@ var dispatchToProps = function dispatchToProps(dispatch) {
         // Then call the reducer and look the the case statement matching the action.type
         podcastsReceived: function podcastsReceived(podcasts) {
             return dispatch(_actions2.default.podcastsReceived(podcasts));
+        },
+        trackListReady: function trackListReady(list) {
+            return dispatch(_actions2.default.trackListReady(list));
         }
     };
 };
@@ -11821,7 +11838,8 @@ function _interopRequireDefault(obj) { return obj && obj.__esModule ? obj : { de
 
 var initialState = {
     all: null,
-    selected: null
+    selected: null,
+    trackList: null
 };
 
 // Reducers are pieces of data to be saved in the Store
@@ -11846,6 +11864,10 @@ exports.default = function () {
             }
 
             updated['selected'] = action.podcast;
+            return updated;
+
+        case _constants2.default.TRACKLIST_READY:
+            updated['trackList'] = action.list;
             return updated;
 
         default:

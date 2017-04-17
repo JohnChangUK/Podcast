@@ -2,7 +2,8 @@ import constants from '../constants';
 
 var initialState = {
     all: null,
-    selected: null
+    selected: null,
+    trackList: null
 };
 
 // Reducers are pieces of data to be saved in the Store
@@ -25,6 +26,10 @@ export default (state = initialState, action) => {
 
         updated['selected'] = action.podcast;
         return updated;
+
+        case constants.TRACKLIST_READY:
+            updated['trackList'] = action.list;
+            return updated;
 
         default:
             return state;
